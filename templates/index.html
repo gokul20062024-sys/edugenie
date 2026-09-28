@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduGenie</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            resize: vertical;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        #answer {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .error {
+            color: #dc2626;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>EduGenie</h1>
+
+    <p class="subtitle">
+        Your AI-powered learning assistant.
+    </p>
+
+    <textarea
+        id="question"
+        placeholder="Enter your question here..."
+    ></textarea>
+
+    <button onclick="askQuestion()">
+        Ask Gemini
+    </button>
+
+    <div id="answer">
+        Your answer will appear here.
+    </div>
+    <hr>
+
+<h2>Generate Quiz</h2>
+
+<input
+    type="text"
+    id="quizTopic"
+    placeholder="Enter a topic for the quiz..."
+>
+
+<button onclick="generateQuiz()">
+    Generate Quiz
+</button>
+
+<div id="quizResult">
+    Your quiz will appear here.
+</div>
+<hr>
+
+<h2>Learning Path</h2>
+
+<input
+    type="text"
+    id="learningTopic"
+    placeholder="Enter a topic to learn..."
+>
+
+<button onclick="createLearningPath()">
+    Create Learning Path
+</button>
+
+<div id="learningPathResult">
+    Your learning path will appear here.
+</div>
+<hr>
+
+<h2>Study Summary</h2>
+
+<input
+    type="text"
+    id="summaryTopic"
+    placeholder="Enter a topic to summarize..."
+>
+
+<button onclick="generateSummary()">
+    Generate Summary
+</button>
+
+<div id="summaryResult">
+    Your summary will appear here.
+</div>
+<hr>
+
+<h2>Topic Explanation</h2>
+
+<input
+    type="text"
+    id="explanationTopic"
+    placeholder="Enter a topic to explain..."
+>
+
+<button onclick="explainTopic()">
+    Explain Topic
+</button>
+
+<div id="explanationResult">
+    Your explanation will appear here.
+</div>
+
+</div>
+
+<script>
+async function askQuestion() {
+
+    const question = document.getElementById("question").value;
+    const answerBox = document.getElementById("answer");
+
+    if (!question.trim()) {
+        answerBox.innerHTML = "Please enter a question.";
+        return;
+    }
+
+    answerBox.innerHTML = "Thinking...";
+
+    try {
+
+        const response = await fetch("/ask", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                question: question
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            answerBox.innerHTML =
+                '<span class="error">' + data.error + '</span>';
+        } else {
+            answerBox.textContent = data.answer;
+        }
+
+    } catch (error) {
+
+        answerBox.innerHTML =
+            '<span class="error">Unable to connect to the server.</span>';
+
+    }
+}
+async function generateQuiz() {
+    const topic = document.getElementById("quizTopic").value;
+    const quizResult = document.getElementById("quizResult");
+
+    if (!topic.trim()) {
+        quizResult.textContent = "Please enter a topic.";
+        return;
+    }
+
+    quizResult.textContent = "Generating quiz...";
+
+    try {
+        const response = await fetch("/quiz", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                topic: topic
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            quizResult.textContent = data.error;
+        } else {
+            quizResult.textContent = data.quiz;
+        }
+
+    } catch (error) {
+        quizResult.textContent = "Unable to connect to the server.";
+    }
+}
+async function createLearningPath() {
+    const topic = document.getElementById("learningTopic").value;
+    const resultBox = document.getElementById("learningPathResult");
+
+    if (!topic.trim()) {
+        resultBox.textContent = "Please enter a topic.";
+        return;
+    }
+
+    resultBox.textContent = "Creating your learning path...";
+
+    try {
+        const response = await fetch("/learning-path", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                topic: topic
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            resultBox.textContent = data.error;
+        } else {
+            resultBox.textContent = data.learning_path;
+        }
+
+    } catch (error) {
+        resultBox.textContent =
+            "Unable to connect to the server.";
+    }
+}
+async function generateSummary() {
+    const topic = document.getElementById("summaryTopic").value;
+    const summaryResult = document.getElementById("summaryResult");
+
+    if (!topic.trim()) {
+        summaryResult.textContent = "Please enter a topic.";
+        return;
+    }
+
+    summaryResult.textContent = "Generating summary...";
+
+    try {
+        const response = await fetch("/summary", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                topic: topic
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            summaryResult.textContent = data.error;
+        } else {
+            summaryResult.textContent = data.summary;
+        }
+
+    } catch (error) {
+        summaryResult.textContent =
+            "Unable to connect to the server.";
+    }
+}
+async function explainTopic() {
+    const topic = document.getElementById("explanationTopic").value;
+    const resultBox = document.getElementById("explanationResult");
+
+    if (!topic.trim()) {
+        resultBox.textContent = "Please enter a topic.";
+        return;
+    }
+
+    resultBox.textContent = "Generating explanation...";
+
+    try {
+        const response = await fetch("/explain", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                topic: topic
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            resultBox.textContent = data.error;
+        } else {
+            resultBox.textContent = data.explanation;
+        }
+
+    } catch (error) {
+        resultBox.textContent =
+            "Unable to connect to the server.";
+    }
+}
+</script>
+
+</body>
+</html>
