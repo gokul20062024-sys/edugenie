@@ -1,5 +1,3 @@
 Flask
 google-genai
-Flask
-google-genai
 gunicorn
